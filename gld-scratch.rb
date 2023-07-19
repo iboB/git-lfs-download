@@ -3,7 +3,6 @@
 #
 require 'tmpdir'
 require 'fileutils'
-require 'find'
 
 REPO = 'https://github.com/iboB/ten-x.git'
 
