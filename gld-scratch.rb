@@ -11,7 +11,7 @@ REPO = 'https://github.com/iboB/ten-x.git'
 tgt_dir = File.basename(REPO, ".git")
 raise "'#{tgt_dir}' exist" if File.exist?(tgt_dir)
 
-res = system {'GIT_LFS_SKIP_SMUDGE' => '1'}, "git clone --depth 1 \"#{REPO}\" \"#{tgt_dir}\""
+res = system({'GIT_LFS_SKIP_SMUDGE' => '1'}, "git clone --depth 1 \"#{REPO}\" \"#{tgt_dir}\"")
 raise "could not clone #{REPO}" if !res
 
 sha_file = {}
@@ -59,16 +59,16 @@ END { FileUtils.rm_rf(bare_dir) }
 res = system "git clone --depth 1 --bare \"#{REPO}\" \"#{bare_dir}\""
 raise "could not clone bare #{REPO}" if !res
 
-# fetch lfs objects
-Dir.chdir(bare_dir) do
-  res = system "git lfs fetch"
-  raise "could not fetch lfs #{REPO}" if !res
-end
-
-# move files
-Dir.chdir(tgt_dir) do
-  sha_file.each do |sha, file|
-    puts "creating #{file}"
+# process files
+sha_file.each do |sha, file|
+  puts "processing #{file}"
+  # fetch
+  Dir.chdir(bare_dir) do
+    res = system "git lfs fetch --include \"#{file}\""
+    raise "could not fetch '#{file}'" if !res
+  end
+  # ... and mov
+  Dir.chdir(tgt_dir) do
     FileUtils.mv [bare_dir, 'lfs/objects', sha.unpack('a2a2'), sha].join('/'), file
   end
 end

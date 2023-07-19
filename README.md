@@ -27,6 +27,7 @@ Unfortunately git-archive can exert quite the cpu toll on the server and most gi
 * Clone a bare repo
 * Clone the same repo skipping lfs smudge to `target`
 * Parse `target/.gitattributes` to identify lfs files
+* Fetch lfs files
 * `mov` the files from `bare/.git/lfs/objects` to their places in `target/`
 * `$ rm -rf bare`
 * `$ rm -rf target/.git`
