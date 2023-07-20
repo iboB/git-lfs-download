@@ -1,10 +1,12 @@
 # git-lfs-download
 
-A CLI tool which downloads a git-lfs repo fully or partially without temporarily using x2 disk space and without using any disk space for lfs files which are not downloaded.
+A CLI tool which downloads a git-lfs repo fully or partially without temporarily using 2x disk space and without using any disk space for lfs files which are not downloaded.
 
 **Usage:**
 
-`$ git-lfs-download <repo-uri> [--match <pattern>] [--without <pattern>]`
+*A Ruby interpreter is needed for the tool*
+
+`$ ./git-lfs-download <repo-uri> [--match <pattern>] [--without <pattern>]`
 
 By default the full repository is downloaded. Adding `--match` patterns will only include files which match any of them. Adding `--without` patterns will exclude files which match any of them.
 
