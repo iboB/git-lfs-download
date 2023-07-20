@@ -2,7 +2,6 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-require 'tmpdir'
 require 'fileutils'
 
 VERSION = "1.0.2"
@@ -71,19 +70,14 @@ ARGV.each_slice(2) do |opt, arg|
   end
 end
 
-# clone bare repo
 tgt_dir = File.basename(REPO, ".git")
 raise "'#{tgt_dir}' exist" if File.exist?(tgt_dir)
 
+# clone repo
 res = system({'GIT_LFS_SKIP_SMUDGE' => '1'}, "git clone --depth 1 \"#{REPO}\" \"#{tgt_dir}\"")
 raise "could not clone #{REPO}" if !res
 
-sha_file = {}
-
 Dir.chdir(tgt_dir) do
-  # remove .git dir as it's not needed
-  FileUtils.rm_rf(".git")
-
   files = []
 
   # positive: collect all lfs files
@@ -108,7 +102,8 @@ Dir.chdir(tgt_dir) do
     }
   end
 
-  # build sha_file
+  # build sha -> file hash
+  sha_file = {}
   files.each do |f|
     lines = File.readlines(f)
     if lines[0].strip != 'version https://git-lfs.github.com/spec/v1'
@@ -121,27 +116,27 @@ Dir.chdir(tgt_dir) do
     end
     sha_file[$1] = f
   end
-end
 
-puts "Identified #{sha_file.size} files which match the provided globs"
+  puts "Identified #{sha_file.size} files which match the provided globs"
 
-bare_dir = Dir.mktmpdir
-FileUtils.mkdir_p bare_dir
-END { FileUtils.rm_rf(bare_dir) }
+  # process files
+  sha_file.each do |sha, file|
+    puts "processing #{file}"
 
-res = system "git clone --depth 1 --bare \"#{REPO}\" \"#{bare_dir}\""
-raise "could not clone bare #{REPO}" if !res
-
-# process files
-sha_file.each do |sha, file|
-  puts "processing #{file}"
-  # fetch
-  Dir.chdir(bare_dir) do
+    # fetch
     res = system "git lfs fetch --include \"#{file}\""
     raise "could not fetch '#{file}'" if !res
+
+    # ... and move
+    FileUtils.mv ['.git/lfs/objects', sha.unpack('a2a2'), sha].join('/'), file
   end
-  # ... and mov
-  Dir.chdir(tgt_dir) do
-    FileUtils.mv [bare_dir, 'lfs/objects', sha.unpack('a2a2'), sha].join('/'), file
-  end
+
+  # FileUtils.rm_rf(".git")
+  # should we remove the .git dir?
+  # even though the repo is kinda broken having binary lfs files,
+  # .git is not corrupt or anything
 end
+
+
+
+

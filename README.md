@@ -42,15 +42,12 @@ Disk space x2 will be required.
 
 ## Hack which this project implements
 
-* Clone a bare repo
-* Clone the same repo skipping lfs smudge to `target`
-* Parse `target/.gitattributes` to identify lfs files
+* Clone a shallow repo skipping lfs smudge
+* Parse `.gitattributes` to identify lfs files
 * Filter lfs files according to provided options (if any)
 * Fetch lfs files
-* `mov` the files from `bare/.git/lfs/objects` to their places in `target/`
-* `$ rm -rf bare`
-* `$ rm -rf target/.git`
-* `target/` contains the downloaded repo
+* `mv` the files from `.git/lfs/objects` to their places in the git root
+* `$ rm -rf .git`
 
 ## Copyright
 
