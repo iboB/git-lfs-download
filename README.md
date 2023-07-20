@@ -1,5 +1,13 @@
 # git-lfs-download
 
+A CLI tool which downloads a git-lfs repo fully or partially without temporarily using x2 disk space and without using any disk space for lfs files which are not downloaded.
+
+**Usage:**
+
+`$ git-lfs-download <repo-uri> [--match <pattern>] [--without <pattern>]`
+
+By default the full repository is downloaded. Adding `--match` patterns will only include files which match any of them. Adding `--without` patterns will exclude files which match any of them.
+
 ## Task
 
 You want to download a git-lfs repo
@@ -22,11 +30,22 @@ This will also solve the sane problem if you encounter it with non git-lfs files
 
 Unfortunately git-archive can exert quite the cpu toll on the server and most git providers (like GitHub and Huggingface) have it disabled server-side rendering it unusable.
 
+## Task 2
+
+You want to download only some large files from a git lfs repo
+
+## Proper solution
+
+Manually `$ git lfs pull --include <file>`. This is pretty cumbersome especially if there are many files, or files to filter-*out*.
+
+Disk space x2 will be required.
+
 ## Hack which this project implements
 
 * Clone a bare repo
 * Clone the same repo skipping lfs smudge to `target`
 * Parse `target/.gitattributes` to identify lfs files
+* Filter lfs files according to provided options (if any)
 * Fetch lfs files
 * `mov` the files from `bare/.git/lfs/objects` to their places in `target/`
 * `$ rm -rf bare`
