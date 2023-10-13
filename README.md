@@ -4,7 +4,7 @@ A CLI tool which downloads a git-lfs repo fully or partially without temporarily
 
 **Usage:**
 
-*A Ruby interpreter is needed for the tool*
+*A Ruby interpreter is needed for the tool. Ruby 3.0.0 or later is required*
 
 `$ ./git-lfs-download <repo-uri> [--match <pattern>] [--without <pattern>]`
 
